@@ -1,4 +1,4 @@
-Operational Profile,DURAÇÃO (h),Engine Load (%),Potencia Maxima (kw),Engines Running,Speed (kn),Draft Bow (m),Draft Stern (m),BEAUFORT,MDO (m³),MDO (m³/h)
+Operational Profile,DURAÇÃO,EngineLoad,PotenciaMaxima,EnginesRunning,Speed,DraftBow,DraftStern,BEAUFORT,MDO,MDOPred
 Transit,0.0361111111111111,0.33,765.6,2.0,10.924,4.41437692,4.83243077,2.4,0.025761,0.7133815384615385
 Eco Transit,0.005,0.36,835.1999999999999,2.0,8.86,2.567,3.904,4.0,0.003982,0.7964
 Transit,0.1002777777777777,0.34,788.8000000000001,2.0,9.34498892,4.48120222,4.21373961,5.4,0.07412,0.7391468144044321
