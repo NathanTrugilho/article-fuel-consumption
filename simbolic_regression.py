@@ -61,7 +61,7 @@ grid = GridSearchCV(
     estimator=base_model,
     param_grid=param_grid,
     cv=cv,
-    verbose=0,
+    verbose=1,
     scoring="neg_mean_squared_error"
 )
 
