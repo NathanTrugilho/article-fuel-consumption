@@ -39,6 +39,7 @@ base_model = PySRRegressor(
     warm_start=False,
     output_directory="grid_search_models",
     parsimony=1e-4, # Penalização por complexidade
+    parallelism='multithreading',
 )
 
 # ======================
