@@ -38,17 +38,17 @@ base_model = PySRRegressor(
     turbo=True,
     warm_start=False,
     output_directory="grid_search_models",
+    parsimony=1e-4, # Penalização por complexidade
 )
 
 # ======================
 # Grid de hiperparâmetros
 # ======================
 param_grid = {
-    "niterations": [100, 200],
+    "niterations": [100, 200, 400],
     "populations": [50, 100, 200],
     "population_size": [50, 100, 200],
-    "maxsize": [20, 30],
-    "parsimony": [1e-3, 1e-4],
+    "maxsize": [20, 30, 40],
 }
 
 # ======================
