@@ -62,7 +62,7 @@ grid = GridSearchCV(
     param_grid=param_grid,
     cv=cv,
     verbose=1,
-    scoring="neg_mean_squared_error"
+    scoring="neg_mean_squared_error",
 )
 
 # Treinar grid search (apenas treino)
@@ -70,7 +70,8 @@ grid.fit(X_train, y_train)
 
 # Melhor modelo após CV
 best_model = grid.best_estimator_
-best_model.output_directory="best_model"
+best_model.set_params(output_directory="best_model")
+best_model.fit(X_train, y_train)
 
 # ======================
 # Função de métricas
@@ -87,14 +88,18 @@ def evaluate(y_true, y_pred, name):
     print(f"MAE:  {mae}")
     print(f"R2:   {r2}")
 
+    with open("metrics.txt", "a") as file:
+        file.write(f"{name}\tMSE: {mse} RMSE: {rmse} MAE: {mae} R2: {r2}\n")
+
+
 # ======================
 # Avaliação
 # ======================
 y_val_pred = best_model.predict(X_val)
-evaluate(y_val, y_val_pred, "Validação")
+evaluate(y_val, y_val_pred, "Validation metrics")
 
 y_test_pred = best_model.predict(X_test)
-evaluate(y_test, y_test_pred, "Teste")
+evaluate(y_test, y_test_pred, "Test metrics")
 
 # ======================
 # Expressão simbólica final
