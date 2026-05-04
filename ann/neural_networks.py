@@ -1,8 +1,13 @@
 import pandas as pd
 import numpy as np
-from pysr import PySRRegressor
+import os
+import joblib
+
+from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 
 # ======================
 # Carregar datasets
@@ -23,31 +28,22 @@ y_val   = val_df.iloc[1:, -1]
 y_test  = test_df.iloc[1:, -1]
 
 # ======================
-# Modelo base
+# Pipeline (Scaler + ANN)
 # ======================
-base_model = PySRRegressor(
-    binary_operators=["+", "-", "*", "/", "^"],
-    unary_operators=["sin", "cos", "exp", "log", "sinh", "cosh", "erf"],
-    model_selection="best",
-    elementwise_loss="loss(x, y) = (x - y)^2",
-    constraints={'^': (-1, 1)},
-    verbosity=True,
-    annealing=True,
-    turbo=True,
-    warm_start=False,
-    output_directory="grid_search_models",
-    parsimony=1e-4,
-    parallelism='multithreading',
-)
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("mlp", MLPRegressor(max_iter=2000, random_state=28))
+])
 
 # ======================
 # Grid
 # ======================
 param_grid = {
-    "niterations": [100, 200, 400],
-    "populations": [50, 100, 200],
-    "population_size": [50, 100, 200],
-    "maxsize": [20, 30, 40],
+    "mlp__activation": ["relu", "tanh"],
+    "mlp__alpha": [0.0001, 0.001, 0.01],
+    "mlp__hidden_layer_sizes": [(32,), (64,), (32,32), (64,32), (64,64), (64,32,16)],
+    "mlp__learning_rate_init": [0.001, 0.01, 0.1],
+    "mlp__solver": ["adam"]
 }
 
 # ======================
@@ -56,11 +52,12 @@ param_grid = {
 cv = KFold(n_splits=5, shuffle=True, random_state=28)
 
 grid = GridSearchCV(
-    estimator=base_model,
+    estimator=pipeline,
     param_grid=param_grid,
     cv=cv,
     verbose=1,
     scoring="neg_mean_squared_error",
+    n_jobs=-1
 )
 
 # Treinamento
@@ -68,8 +65,13 @@ grid.fit(X_train, y_train)
 
 # Melhor modelo
 best_model = grid.best_estimator_
-best_model.set_params(output_directory="best_model")
 best_model.fit(X_train, y_train)
+
+# ======================
+# Salvar modelo
+# ======================
+os.makedirs("ann/best_model", exist_ok=True)
+joblib.dump(best_model, "ann/best_model/model.joblib")
 
 # ======================
 # Métricas
@@ -100,6 +102,3 @@ print_metrics(y_test, y_test_pred, "Test")
 # ======================
 print("\nMelhores hiperparâmetros:")
 print(grid.best_params_)
-
-print("\nEquação encontrada:")
-print(best_model)
