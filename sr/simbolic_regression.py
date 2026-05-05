@@ -11,32 +11,29 @@ train_df = pd.read_csv("dataset/train.csv")
 val_df = pd.read_csv("dataset/validation.csv")
 test_df = pd.read_csv("dataset/test.csv")
 
-# Features
 X_train = train_df.iloc[1:, 5:9]
 y_train = train_df.iloc[1:, -1]
 
 X_val   = val_df.iloc[1:, 5:9]
 X_test  = test_df.iloc[1:, 5:9]
 
-# Target
 y_val   = val_df.iloc[1:, -1]
 y_test  = test_df.iloc[1:, -1]
 
 # ======================
-# Modelo base
+# Modelo base (grid)
 # ======================
 base_model = PySRRegressor(
+    niterations=100,
     binary_operators=["+", "-", "*", "/", "^"],
     unary_operators=["sin", "cos", "exp", "log", "sinh", "cosh", "erf"],
     model_selection="best",
     elementwise_loss="loss(x, y) = (x - y)^2",
     constraints={'^': (-1, 1)},
-    verbosity=True,
+    verbosity=False,
     annealing=True,
     turbo=True,
     warm_start=False,
-    output_directory="grid_search_models",
-    parsimony=1e-4,
     parallelism='multithreading',
 )
 
@@ -44,10 +41,10 @@ base_model = PySRRegressor(
 # Grid
 # ======================
 param_grid = {
-    "niterations": [100, 200, 400],
     "populations": [50, 100, 200],
     "population_size": [50, 100, 200],
     "maxsize": [20, 30, 40],
+    "parsimony": [1e-5, 1e-4, 1e-3],
 }
 
 # ======================
@@ -63,13 +60,36 @@ grid = GridSearchCV(
     scoring="neg_mean_squared_error",
 )
 
-# Treinamento
+# ======================
+# Fase 1: Grid
+# ======================
 grid.fit(X_train, y_train)
 
-# Melhor modelo
-best_model = grid.best_estimator_
-best_model.set_params(output_directory="best_model")
-best_model.fit(X_train, y_train)
+best_params = grid.best_params_
+
+print("\nMelhores hiperparâmetros (grid):")
+print(best_params)
+
+# ======================
+# Fase 2: Modelo final (recriado)
+# ======================
+final_model = PySRRegressor(
+    niterations=100000,
+    binary_operators=["+", "-", "*", "/", "^"],
+    unary_operators=["sin", "cos", "exp", "log", "sinh", "cosh", "erf"],
+    model_selection="best",
+    elementwise_loss="loss(x, y) = (x - y)^2",
+    constraints={'^': (-1, 1)},
+    verbosity=True,
+    annealing=True,
+    turbo=True,
+    warm_start=False,
+    output_directory="best_model",
+    parallelism='multithreading',
+    **best_params
+)
+
+final_model.fit(X_train, y_train)
 
 # ======================
 # Métricas
@@ -89,17 +109,14 @@ def print_metrics(y_true, y_pred, name):
 # ======================
 # Avaliação
 # ======================
-y_val_pred = best_model.predict(X_val)
+y_val_pred = final_model.predict(X_val)
 print_metrics(y_val, y_val_pred, "Validation")
 
-y_test_pred = best_model.predict(X_test)
+y_test_pred = final_model.predict(X_test)
 print_metrics(y_test, y_test_pred, "Test")
 
 # ======================
-# Resultados finais
+# Resultado final
 # ======================
-print("\nMelhores hiperparâmetros:")
-print(grid.best_params_)
-
 print("\nEquação encontrada:")
-print(best_model)
+print(final_model)
