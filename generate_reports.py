@@ -52,7 +52,13 @@ for i in range(len(sr_model.equations_)):
         best_sr_mse = mse
         best_sr_idx = i
 
-print(f"Melhor equação SR: #{best_sr_idx + 1}")
+print(f"Melhor equação SR: #{best_sr_idx + 1}\n")
+
+print(f"Melhor combinação de hiperparâmetros SR:\n"
+ f" Populations:{sr_model.populations},\n"
+ f" Population Size:{sr_model.population_size},\n"
+ f" Maxsize:{sr_model.maxsize},\n"
+ f" Parsimony:{sr_model.parsimony}")
 
 try:
     print(
@@ -90,6 +96,11 @@ with open("metrics.txt", "w", encoding="utf-8") as f:
                     f"Expression: "
                     f"{model.equations_.iloc[best_sr_idx]['equation']}\n"
                 )
+                f.write(f"Melhor combinação de hiperparâmetros SR:\n"
+                    f" Populations:{sr_model.populations},\n"
+                    f" Population Size:{sr_model.population_size},\n"
+                    f" Maxsize:{sr_model.maxsize},\n"
+                    f" Parsimony:{sr_model.parsimony}")
             except Exception:
                 pass
 
@@ -138,8 +149,8 @@ def plot_sorted_scatter(ax, y_true, y_pred, title):
     )
 
     ax.set_title(title)
-    ax.set_xlabel("Amostras (ordenadas)")
-    ax.set_ylabel("Valor")
+    ax.set_xlabel("Samples")
+    ax.set_ylabel("MDO (m³/h)")
     ax.legend()
 
 # ======================
