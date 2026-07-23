@@ -55,10 +55,10 @@ for i in range(len(sr_model.equations_)):
 print(f"Melhor equação SR: #{best_sr_idx + 1}\n")
 
 print(f"Melhor combinação de hiperparâmetros SR:\n"
- f" Populations:{sr_model.populations},\n"
- f" Population Size:{sr_model.population_size},\n"
- f" Maxsize:{sr_model.maxsize},\n"
- f" Parsimony:{sr_model.parsimony}")
+      f" Populations:{sr_model.populations},\n"
+      f" Population Size:{sr_model.population_size},\n"
+      f" Maxsize:{sr_model.maxsize},\n"
+      f" Parsimony:{sr_model.parsimony}")
 
 try:
     print(
@@ -97,10 +97,10 @@ with open("metrics.txt", "w", encoding="utf-8") as f:
                     f"{model.equations_.iloc[best_sr_idx]['equation']}\n"
                 )
                 f.write(f"Melhor combinação de hiperparâmetros SR:\n"
-                    f" Populations:{sr_model.populations},\n"
-                    f" Population Size:{sr_model.population_size},\n"
-                    f" Maxsize:{sr_model.maxsize},\n"
-                    f" Parsimony:{sr_model.parsimony}")
+                        f" Populations:{sr_model.populations},\n"
+                        f" Population Size:{sr_model.population_size},\n"
+                        f" Maxsize:{sr_model.maxsize},\n"
+                        f" Parsimony:{sr_model.parsimony}")
             except Exception:
                 pass
 
@@ -130,7 +130,7 @@ with open("metrics.txt", "w", encoding="utf-8") as f:
 # ======================
 # Função de plot
 # ======================
-def plot_sorted_scatter(ax, y_true, y_pred, title):
+def plot_sorted_scatter(ax, y_true, y_pred):
     idx = np.argsort(y_true)
 
     y_true_sorted = y_true.iloc[idx].values
@@ -139,18 +139,17 @@ def plot_sorted_scatter(ax, y_true, y_pred, title):
     ax.scatter(
         range(len(y_true_sorted)),
         y_true_sorted,
-        label="Real"
+        label="True"
     )
 
     ax.scatter(
         range(len(y_pred_sorted)),
         y_pred_sorted,
-        label="Prediction"
+        label="Predicted"
     )
 
-    ax.set_title(title)
-    ax.set_xlabel("Samples")
-    ax.set_ylabel("MDO (m³/h)")
+    ax.set_xlabel("Samples", fontsize=12)
+    ax.set_ylabel("MDO (m³/h)", fontsize=12)
     ax.legend()
 
 # ======================
@@ -167,12 +166,10 @@ for name, model in models.items():
 
     if name == "SR":
         y_pred = model.predict(X_val, index=best_sr_idx)
-        title = f"SR - Validation"
-        filename = "plots/validation/SR_validation.png"
+        filename = "plots/validation/SR_validation.pdf"
     else:
         y_pred = model.predict(X_val)
-        title = f"{name} - Validation"
-        filename = f"plots/validation/{name}_validation.png"
+        filename = f"plots/validation/{name}_validation.pdf"
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -180,13 +177,11 @@ for name, model in models.items():
         ax,
         y_val,
         y_pred,
-        title
     )
 
     plt.tight_layout()
     plt.savefig(
         filename,
-        dpi=300,
         bbox_inches="tight"
     )
     plt.close(fig)
@@ -198,12 +193,10 @@ for name, model in models.items():
 
     if name == "SR":
         y_pred = model.predict(X_test, index=best_sr_idx)
-        title = f"SR - Test"
-        filename = "plots/test/SR_test.png"
+        filename = "plots/test/SR_test.pdf"
     else:
         y_pred = model.predict(X_test)
-        title = f"{name} - Test"
-        filename = f"plots/test/{name}_test.png"
+        filename = f"plots/test/{name}_test.pdf"
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -211,13 +204,11 @@ for name, model in models.items():
         ax,
         y_test,
         y_pred,
-        title
     )
 
     plt.tight_layout()
     plt.savefig(
         filename,
-        dpi=300,
         bbox_inches="tight"
     )
     plt.close(fig)

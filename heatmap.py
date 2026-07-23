@@ -19,7 +19,7 @@ X_val = val_df.iloc[1:, 5:9]
 X_test = test_df.iloc[1:, 5:9]
 
 # Renomear as colunas
-columns = ["Speed", "DraftBow", "DraftStern", "BEAUFORT"]
+columns = ["Speed", "DraftBow", "DraftStern", "Beaufort"]
 
 X_train.columns = columns
 X_val.columns = columns
@@ -57,13 +57,11 @@ sns.heatmap(
     square=True
 )
 
-plt.title("Correlation Matrix of the Input Variables")
 plt.tight_layout()
 
 # Salvar figura
 plt.savefig(
-    "correlation_heatmap.png",
-    dpi=300,
+    "correlation_heatmap.pdf",
     bbox_inches="tight"
 )
 
